@@ -1,0 +1,32 @@
+name: Build and Deploy
+
+# When should the robot weakup?
+on:
+  push:
+    branches: [ main ]
+
+jobs: 
+  build-and-depoly:
+    runs-on: ubuntu-latest
+
+    steps:
+    # step1: Get your code
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    # step2: Setup Docker
+    - name: Set up Docker
+      uses: docker/setup-buildx-action@v2
+
+    # step3: Build Docker image
+    - name: Build Docker image
+      run: |
+        docker build -t my-first-app:latest .
+
+    # step4: Test it works
+    - name: Test
+      run: |
+        docker run -d -p 8080:80 --name test-container my-first-app:latest
+        sleep 5
+        curl http://localhost:8080
+        docker stop test-container
